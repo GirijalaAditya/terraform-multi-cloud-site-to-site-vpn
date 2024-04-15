@@ -1,23 +1,26 @@
 resource "aws_vpc" "vpc" {
-  cidr_block           = "192.168.0.0/16"
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+  cidr_block                           = var.cidr_block
+  instance_tenancy                     = "default"
+  enable_dns_hostnames                 = true
+  enable_dns_support                   = true
+  enable_network_address_usage_metrics = false
   tags = {
     "Name" = "aws-vpc"
   }
 }
 
 resource "aws_subnet" "public-subnet" {
-  cidr_block        = "192.168.1.0/24"
-  vpc_id            = aws_vpc.vpc.id
-  availability_zone = "us-east-1a"
+  cidr_block              = var.public_subnet_cidr_block
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
   tags = {
     Name = "Public-Subnet"
   }
 }
 
 resource "aws_subnet" "private-subnet" {
-  cidr_block        = "192.168.10.0/24"
+  cidr_block        = var.private_subnet_cidr_block
   vpc_id            = aws_vpc.vpc.id
   availability_zone = "us-east-1b"
   tags = {
@@ -46,12 +49,12 @@ resource "aws_route_table" "private-route-table" {
   }
 }
 
-resource "aws_route_table_association" "public-route-table-1-association" {
+resource "aws_route_table_association" "public-route-table-association" {
   route_table_id = aws_route_table.public-route-table.id
   subnet_id      = aws_subnet.public-subnet.id
 }
 
-resource "aws_route_table_association" "private-route-table-2-association" {
+resource "aws_route_table_association" "private-route-table-association" {
   route_table_id = aws_route_table.private-route-table.id
   subnet_id      = aws_subnet.private-subnet.id
 }
@@ -63,18 +66,18 @@ resource "aws_route" "public-internet-gw-route" {
 }
 
 resource "aws_eip" "elastic-ip-for-nat-gw" {
-  domain                    = "vpc"
-  associate_with_private_ip = "10.0.0.5"
+  domain = "vpc"
   tags = {
-    Name = "my-eip"
+    Name = "nat-eip"
   }
+  depends_on = [aws_internet_gateway.igw]
 }
 
 resource "aws_nat_gateway" "nat-gw" {
   allocation_id = aws_eip.elastic-ip-for-nat-gw.id
   subnet_id     = aws_subnet.public-subnet.id
   tags = {
-    Name = "my-ngw"
+    Name = "ngw"
   }
   depends_on = [aws_eip.elastic-ip-for-nat-gw]
 }

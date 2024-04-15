@@ -26,5 +26,5 @@ variable "subscription_id" {
 variable "azure_vm_password" {
   type        = string
   description = "Azure VM Password"
-  sensitive = true
+  sensitive   = true
 }

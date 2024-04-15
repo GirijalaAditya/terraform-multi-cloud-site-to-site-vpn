@@ -24,6 +24,7 @@ resource "azurerm_public_ip" "azure_pip_1" {
   resource_group_name = data.azurerm_resource_group.azure_rg.name
   location            = data.azurerm_resource_group.azure_rg.location
   allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_public_ip" "azure_pip_2" {
@@ -31,4 +32,5 @@ resource "azurerm_public_ip" "azure_pip_2" {
   resource_group_name = data.azurerm_resource_group.azure_rg.name
   location            = data.azurerm_resource_group.azure_rg.location
   allocation_method   = "Static"
+  sku                 = "Standard"
 }

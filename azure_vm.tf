@@ -19,14 +19,13 @@ resource "azurerm_network_interface" "azure_vmnic" {
   }
 }
 
-resource "azurerm_linux_virtual_machine" "azure_vm" {
-  name                            = "azurevm"
-  resource_group_name             = data.azurerm_resource_group.azure_rg.name
-  location                        = data.azurerm_resource_group.azure_rg.location
-  size                            = "Standard_D2s_v3"
-  disable_password_authentication = false
-  admin_username                  = "azureuser"
-  admin_password                  = var.azure_vm_password
+resource "azurerm_windows_virtual_machine" "azure_vm" {
+  name                = "azurevm"
+  resource_group_name = data.azurerm_resource_group.azure_rg.name
+  location            = data.azurerm_resource_group.azure_rg.location
+  size                = "Standard_D2s_v3"
+  admin_username      = "azureuser"
+  admin_password      = var.azure_vm_password
   network_interface_ids = [
     azurerm_network_interface.azure_vmnic.id,
   ]
@@ -37,9 +36,9 @@ resource "azurerm_linux_virtual_machine" "azure_vm" {
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
     version   = "latest"
   }
 }
